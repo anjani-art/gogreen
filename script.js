@@ -1,16 +1,19 @@
-// Konfigurasi Firebase (GANTI DENGAN KONFIGURASI PROYEK ANDA SENDIRI!)
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
+// Variabel global untuk Firestore
+let db;
 
-// Inisialisasi Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// Pastikan DOM sudah dimuat sebelum mencoba mengakses elemen atau Firebase
+document.addEventListener('DOMContentLoaded', () => {
+    // Inisialisasi Firestore setelah Firebase app diinisialisasi di index.html
+    // Objek `firebase` sudah tersedia secara global
+    if (typeof firebase !== 'undefined' && firebase.firestore) {
+        db = firebase.firestore();
+        initializeAppFeatures();
+    } else {
+        console.error("Firebase SDK belum dimuat atau inisialisasi gagal. Pastikan koneksi internet dan konfigurasi Firebase di index.html benar.");
+        alert("Terjadi kesalahan saat memuat aplikasi. Mohon coba refresh halaman atau cek koneksi internet Anda.");
+    }
+});
+
 
 // Referensi Elemen DOM
 const headerTitleEl = document.getElementById('headerTitle');
@@ -29,7 +32,7 @@ const productImpactEl = document.getElementById('productImpact');
 const productDIYEl = document.getElementById('productDIY');
 
 // Objek Data Produk Go Green (Data Awal untuk Populasi Firestore)
-// Setelah diisi ke Firestore, aplikasi akan mengambil data dari sana.
+// Data ini HANYA digunakan untuk mengisi Firestore pertama kali.
 const goGreenProductsData = {
     'Rumah Tangga': [
         {
@@ -131,7 +134,7 @@ const goGreenProductsData = {
                 ingredients: 'Stainless Steel (mis. SUS304).',
                 production: 'Produksi standar industri dengan fokus pada durabilitas untuk penggunaan jangka panjang.',
                 impact: 'Mengurangi signifikan limbah gelas plastik/kertas sekali pakai. Tahan lama dan dapat didaur ulang.',
-                diy: 'Tidak dapat dibuat sendiri di rumah. <br><br>Berikut contoh produk tumbler stainless steel di Shopee: <a href="https://shopee.co.id/Eatkit-Tumbler-Stainless-Steel-320ml-600ml-Tumbler-Tahan-Dingin-Tumbler-Kopi-Tumbler-Tahan-Panas-Dingin-24-Jam-i.1113470230.24322289831?sp_atk=c882ce4-f563-4b38-9cce-a3681a6722c1&xptdk=c882ce4-f563-4b38-9cce-a3681a6722c1" target="_blank" rel="noopener noreferrer" style="color:#6366F1; font-weight:600;">Eatkit Tumbler Stainless Steel (Link Eksternal)</a>'
+                diy: 'Tidak dapat dibuat sendiri di rumah. <br><br>Berikut contoh produk tumbler stainless steel di Shopee: <a href="https://shopee.co.id/Eatkit-Tumbler-Stainless-Steel-320ml-600ml-Tumbler-Kopi-Tumbler-Tahan-Panas-Dingin-24-Jam-i.1113470230.24322289831?sp_atk=c882ce4-f563-4b38-9cce-a3681a6722c1&xptdk=c882ce4-f563-4b38-9cce-a3681a6722c1" target="_blank" rel="noopener noreferrer" style="color:#6366F1; font-weight:600;">Eatkit Tumbler Stainless Steel (Link Eksternal)</a>'
             }
         },
     ],
@@ -163,7 +166,6 @@ function showPage(pageId) {
     document.getElementById(pageId).classList.add('active');
     currentPage = pageId;
 
-    // Tampilkan/sembunyikan tombol kembali
     if (pageId === 'homePage') {
         headerTitleEl.textContent = 'EcoGlow';
         backButtonEl.style.display = 'none';
@@ -210,8 +212,10 @@ async function showProductListings(category) {
     productListEl.innerHTML = ''; // Bersihkan daftar produk sebelumnya
 
     try {
+        // Menggunakan API Compatibility Firebase Firestore
+        // `collection` adalah metode dari instance firestore `db`
         const productsRef = db.collection('goGreenProducts');
-        const querySnapshot = await productsRef.where('category', '==', category).get();
+        const querySnapshot = await productsRef.where('category', '==', category).get(); // Menggunakan `.where()` dan `.get()`
 
         if (querySnapshot.empty) {
             productListEl.innerHTML = '<p style="text-align: center; color: var(--text-light); margin-top: 30px;">Tidak ada produk di kategori ini.</p>';
@@ -277,7 +281,8 @@ async function populateGoGreenProductsToFirestore() {
             try {
                 // Tambahkan kategori ke objek produk sebelum disimpan
                 const productToSave = { ...product, category: category };
-                await db.collection('goGreenProducts').doc(product.id).set(productToSave);
+                // Menggunakan API Compatibility Firebase Firestore
+                await db.collection('goGreenProducts').doc(product.id).set(productToSave); // Menggunakan `.doc()` dan `.set()`
                 console.log(`Produk "${product.name}" berhasil ditambahkan/diperbarui.`);
             } catch (error) {
                 console.error(`Gagal menambahkan produk "${product.name}":`, error);
@@ -304,7 +309,8 @@ function initializeAppFeatures() {
 // Inisialisasi PWA Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
+        // Path service worker (tanpa garis miring di depan karena di root folder)
+        navigator.serviceWorker.register('service-worker.js')
             .then(registration => {
                 console.log('Service Worker terdaftar:', registration);
             })
@@ -313,6 +319,3 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
-
-// Memulai Aplikasi setelah DOM sepenuhnya dimuat
-document.addEventListener('DOMContentLoaded', initializeAppFeatures);
