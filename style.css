@@ -1,315 +1,38 @@
-/* Palet Warna */
+/* Variabel Warna Global */
 :root {
-    --primary-green: #34D399; /* Hijau Segar */
-    --secondary-green: #10B981; /* Hijau Lebih Gelap */
-    --accent-blue: #6366F1; /* Aksen Biru Futuristik */
-    --text-dark: #2D3748; /* Teks Gelap */
-    --text-light: #4A5568; /* Teks Terang */
-    --background-light: #F0FDF4; /* Latar Belakang Sangat Terang */
-    --card-background: #ffffff; /* Latar Belakang Kartu */
-    --border-color: #E2E8F0; /* Warna Border */
+    --primary-green: #34D399; /* Hijau Neon Terang */
+    --dark-green: #065F46;   /* Hijau Gelap untuk latar belakang */
+    --light-gray: #D1D5DB;   /* Abu-abu terang untuk teks/garis */
+    --dark-gray: #1F2937;    /* Abu-abu gelap untuk teks */
+    --background-dark: #111827; /* Latar belakang sangat gelap */
+    --card-background: #1F2937; /* Latar belakang kartu */
+    --border-color: #4B5563; /* Warna border */
+    --text-light: #F3F4F6;   /* Teks terang */
+    --text-dark: #1F2937;    /* Teks gelap */
+    --red-alert: #EF4444;    /* Merah untuk peringatan/hapus */
+    --blue-info: #3B82F6;    /* Biru untuk info/pin */
 }
 
-/* General Body and Layout */
+/* Reset dan Gaya Dasar */
 body {
-    font-family: 'Poppins', sans-serif; /* Menggunakan Poppins untuk kesan modern */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
-    background-color: var(--background-light);
-    color: var(--text-dark);
+    padding: 0;
+    background-color: var(--background-dark);
+    color: var(--text-light);
     line-height: 1.6;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .app-header {
-    background-color: var(--primary-green);
-    color: white;
-    padding: 20px 25px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 10;
-}
-
-.app-header h1 {
-    margin: 0;
-    font-size: 2em;
-    font-weight: 700;
-    letter-spacing: 0.05em; /* Sedikit spasi untuk kesan modern */
-}
-
-.app-content {
-    flex-grow: 1; /* Konten mengisi ruang yang tersisa */
-    padding: 30px 20px;
-    max-width: 900px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box; /* Pastikan padding tidak menambah lebar */
-}
-
-.app-footer {
-    background-color: var(--text-dark);
-    color: white;
-    text-align: center;
-    padding: 20px 25px;
-    margin-top: auto; /* Dorong footer ke bawah */
-    font-size: 0.9em;
-}
-
-/* Page Management */
-.page {
-    display: none;
-    animation: fadeIn 0.5s ease-out; /* Animasi fade-in */
-}
-
-.page.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Back Button */
-.back-button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.8em;
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%; /* Bentuk lingkaran */
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.back-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(-50%) scale(1.05);
-}
-
-/* Category Grid */
-.category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 25px;
-    margin-top: 40px;
-}
-
-.category-card {
-    background-color: var(--card-background);
-    border-radius: 15px; /* Lebih halus */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08); /* Shadow lebih lembut */
-    padding: 25px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid var(--border-color); /* Border tipis */
-}
-
-.category-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-}
-
-.category-card i {
-    font-size: 3.5em;
-    color: var(--primary-green);
-    margin-bottom: 15px;
-}
-
-.category-card h3 {
-    margin: 0;
-    font-size: 1.3em;
-    color: var(--text-dark);
-    font-weight: 600;
-}
-
-/* Product List */
-.product-list {
-    margin-top: 25px;
-}
-
-.product-item {
-    background-color: var(--card-background);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-    margin-bottom: 18px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    border: 1px solid var(--border-color);
-}
-
-.product-item:hover {
-    transform: translateX(8px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    border-color: var(--primary-green);
-}
-
-.product-item .product-info {
-    flex-grow: 1;
-}
-
-.product-item h3 {
-    margin: 0 0 8px 0;
-    color: var(--text-dark);
-    font-size: 1.5em;
-    font-weight: 600;
-}
-
-.product-item p {
-    margin: 0;
+    background-color: var(--dark-green);
     color: var(--text-light);
-    font-size: 1em;
-}
-
-.product-item .fa-chevron-right {
-    color: var(--primary-green);
-    font-size: 1.3em;
-    margin-left: 15px;
-}
-
-/* Product Detail Page */
-.product-detail-content {
-    background-color: var(--card-background);
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-    padding: 35px;
-    margin-top: 25px;
-    border: 1px solid var(--border-color);
-}
-
-.product-detail-content h2 {
-    font-size: 2em;
-    color: var(--primary-green);
-    margin-bottom: 20px;
-}
-
-.product-detail-content h3 {
-    color: var(--secondary-green);
-    font-size: 2.2em;
-    margin-bottom: 15px;
-    border-bottom: 2px solid var(--primary-green); /* Border bawah yang tegas */
-    padding-bottom: 15px;
-    font-weight: 700;
-}
-
-.product-detail-content h4 {
-    color: var(--accent-blue); /* Menggunakan aksen biru */
-    margin-top: 30px;
-    margin-bottom: 12px;
-    font-size: 1.25em;
-    font-weight: 600;
-}
-
-.product-detail-content p {
-    color: var(--text-light);
-    font-size: 1.05em;
-    margin-bottom: 20px;
-    line-height: 1.7;
-}
-
-/* Certification Tags */
-.certification-tags {
-    margin-bottom: 25px;
-}
-
-.certification-tag {
-    display: inline-block;
-    background-color: rgba(52, 211, 153, 0.15); /* Primary green dengan opacity */
-    color: var(--secondary-green);
-    padding: 8px 15px;
-    border-radius: 25px;
-    font-size: 0.9em;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    border: 1px solid rgba(52, 211, 153, 0.3);
-}
-
-/* Link di bagian DIY */
-#productDIY a {
-    color: var(--accent-blue); /* Link Shopee menggunakan warna aksen */
-    font-weight: 700;
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-#productDIY a:hover {
-    color: #4C4EF1; /* Sedikit lebih gelap saat hover */
-    text-decoration: underline;
-}
-
-
-/* Responsiveness */
-@media (max-width: 768px) {
-    .app-header h1 {
-        font-size: 1.6em;
-    }
-    .back-button {
-        font-size: 1.6em;
-        left: 10px;
-    }
-    .app-content {
-        padding: 20px 15px;
-    }
-    .category-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 15px;
-    }
-    .category-card {
-        padding: 20px;
-    }
-    .category-card i {
-        font-size: 3em;
-    }
-    .product-item {
-        padding: 15px;
-    }
-    .product-detail-content {
-        padding: 25px;
-    }
-    .product-detail-content h3 {
-        font-size: 1.8em;
-    }
-    .product-detail-content h4 {
-        font-size: 1.1em;
-    }
-    .product-detail-content p {
-        font-size: 0.95em;
-    }
-}
-
-@media (max-width: 480px) {
-    .app-header h1 {
-        font-size: 1.4em;
-    }
-    .back-button {
-        font-size: 1.4em;
-    }
-    .category-grid {
-        grid-template-columns: 1fr 1fr; /* 2 kolom di layar sangat kecil */
-        gap: 10px;
-    }
-    .category-card {
-        padding: 15px;
-    }
-    .category-card h3 {
-        font-size: 1.1em;
-    }
-    .product-item h3 {
-        font-size: 1.2em;
-    }
-    .product-item p {
-        font-size: 0.9em;
-    }
-}
+    padding: 1rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    position: relative
+    
