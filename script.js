@@ -1,12 +1,21 @@
-// Variabel global untuk Firestore
 let db;
+let collection;
+let doc;
+let setDoc;
+let getDocs;
+let where;
+let query;
 
-// Pastikan DOM sudah dimuat sebelum mencoba mengakses elemen atau Firebase
 document.addEventListener('DOMContentLoaded', () => {
-    // Inisialisasi Firestore setelah Firebase app diinisialisasi di index.html
-    // Objek `firebase` sudah tersedia secara global
-    if (typeof firebase !== 'undefined' && firebase.firestore) {
-        db = firebase.firestore();
+    if (window.firebaseDb && window.firebaseFirestore) {
+        db = window.firebaseDb;
+        collection = window.firebaseFirestore.collection;
+        doc = window.firebaseFirestore.doc;
+        setDoc = window.firebaseFirestore.setDoc;
+        getDocs = window.firebaseFirestore.getDocs;
+        where = window.firebaseFirestore.where;
+        query = window.firebaseFirestore.query;
+
         initializeAppFeatures();
     } else {
         console.error("Firebase SDK belum dimuat atau inisialisasi gagal. Pastikan koneksi internet dan konfigurasi Firebase di index.html benar.");
@@ -14,8 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
-// Referensi Elemen DOM
 const headerTitleEl = document.getElementById('headerTitle');
 const backButtonEl = document.getElementById('backButton');
 const homePageEl = document.getElementById('homePage');
@@ -31,8 +38,6 @@ const productProductionEl = document.getElementById('productProduction');
 const productImpactEl = document.getElementById('productImpact');
 const productDIYEl = document.getElementById('productDIY');
 
-// Objek Data Produk Go Green (Data Awal untuk Populasi Firestore)
-// Data ini HANYA digunakan untuk mengisi Firestore pertama kali.
 const goGreenProductsData = {
     'Rumah Tangga': [
         {
@@ -154,11 +159,9 @@ const goGreenProductsData = {
     ]
 };
 
-// State Aplikasi
 let currentPage = 'homePage';
 let currentCategory = '';
 
-// Fungsi Navigasi Halaman
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
@@ -174,7 +177,6 @@ function showPage(pageId) {
     }
 }
 
-// Handler Tombol Kembali
 backButtonEl.addEventListener('click', () => {
     if (currentPage === 'productListingsPage') {
         showPage('homePage');
@@ -183,14 +185,12 @@ backButtonEl.addEventListener('click', () => {
     }
 });
 
-// Fungsi untuk menampilkan Kategori
 function renderCategories() {
-    categoryGridEl.innerHTML = ''; // Bersihkan kategori sebelumnya
+    categoryGridEl.innerHTML = '';
     for (const category in goGreenProductsData) {
         const categoryCard = document.createElement('div');
         categoryCard.classList.add('category-card');
         let iconClass = '';
-        // Contoh ikon berdasarkan kategori (Anda bisa menambahkan lebih banyak)
         switch (category) {
             case 'Rumah Tangga': iconClass = 'fas fa-house-chimney'; break;
             case 'Perawatan Diri': iconClass = 'fas fa-spa'; break;
@@ -205,23 +205,21 @@ function renderCategories() {
     }
 }
 
-// Fungsi untuk menampilkan Daftar Produk berdasarkan Kategori (Mengambil dari Firestore)
 async function showProductListings(category) {
     currentCategory = category;
     productListingTitleEl.textContent = `Kategori: ${category}`;
-    productListEl.innerHTML = ''; // Bersihkan daftar produk sebelumnya
+    productListEl.innerHTML = '';
 
     try {
-        // Menggunakan API Compatibility Firebase Firestore
-        // `collection` adalah metode dari instance firestore `db`
-        const productsRef = db.collection('goGreenProducts');
-        const querySnapshot = await productsRef.where('category', '==', category).get(); // Menggunakan `.where()` dan `.get()`
+        const productsRef = collection(db, 'goGreenProducts');
+        const q = query(productsRef, where('category', '==', category));
+        const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
             productListEl.innerHTML = '<p style="text-align: center; color: var(--text-light); margin-top: 30px;">Tidak ada produk di kategori ini.</p>';
         } else {
-            querySnapshot.forEach(doc => {
-                const product = doc.data();
+            querySnapshot.forEach(docSnap => {
+                const product = docSnap.data();
                 const productItem = document.createElement('div');
                 productItem.classList.add('product-item');
                 productItem.innerHTML = `
@@ -236,23 +234,20 @@ async function showProductListings(category) {
             });
         }
         showPage('productListingsPage');
-        headerTitleEl.textContent = category; // Ganti judul header dengan nama kategori
+        headerTitleEl.textContent = category;
     } catch (error) {
         console.error("Error fetching products: ", error);
         productListEl.innerHTML = '<p style="text-align: center; color: red; margin-top: 30px;">Terjadi kesalahan saat memuat produk.</p>';
     }
 }
 
-
-// Fungsi untuk menampilkan Detail Produk
 function showProductDetail(product) {
     showPage('productDetailPage');
     productDetailTitleEl.textContent = 'Detail Produk';
-    headerTitleEl.textContent = product.name; // Ganti judul header dengan nama produk di bar header
+    headerTitleEl.textContent = product.name;
 
     productNameEl.textContent = product.name;
 
-    // Tampilkan sertifikasi
     productCertificationsEl.innerHTML = '';
     if (product.details.certifications && product.details.certifications.length > 0) {
         product.details.certifications.forEach(cert => {
@@ -268,21 +263,16 @@ function showProductDetail(product) {
     productIngredientsEl.innerHTML = product.details.ingredients || 'Tidak ada informasi.';
     productProductionEl.innerHTML = product.details.production || 'Tidak ada informasi.';
     productImpactEl.innerHTML = product.details.impact || 'Tidak ada informasi.';
-    // Gunakan innerHTML karena diy sekarang mengandung tag <a>
     productDIYEl.innerHTML = product.details.diy || 'Tidak ada informasi.';
 }
 
-// Fungsi untuk mengisi data produk ke Firestore
-// JALANKAN INI HANYA SEKALI untuk mempopulasi database Anda.
 async function populateGoGreenProductsToFirestore() {
     console.log("Memulai populasi data ke Firestore...");
     for (const category in goGreenProductsData) {
         for (const product of goGreenProductsData[category]) {
             try {
-                // Tambahkan kategori ke objek produk sebelum disimpan
                 const productToSave = { ...product, category: category };
-                // Menggunakan API Compatibility Firebase Firestore
-                await db.collection('goGreenProducts').doc(product.id).set(productToSave); // Menggunakan `.doc()` dan `.set()`
+                await setDoc(doc(db, 'goGreenProducts', product.id), productToSave);
                 console.log(`Produk "${product.name}" berhasil ditambahkan/diperbarui.`);
             } catch (error) {
                 console.error(`Gagal menambahkan produk "${product.name}":`, error);
@@ -292,9 +282,8 @@ async function populateGoGreenProductsToFirestore() {
     console.log("Selesai populasi data ke Firestore.");
 }
 
-// Inisialisasi Fitur Aplikasi
 function initializeAppFeatures() {
-    renderCategories(); // Tampilkan kategori saat aplikasi pertama kali dimuat
+    renderCategories();
 
     // --- PENTING: POPULASI DATA KE FIRESTORE ---
     // Jalankan fungsi populateGoGreenProductsToFirestore() HANYA SEKALI saat pertama kali setup
@@ -305,11 +294,8 @@ function initializeAppFeatures() {
     // --- AKHIR PENTING ---
 }
 
-
-// Inisialisasi PWA Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        // Path service worker (tanpa garis miring di depan karena di root folder)
         navigator.serviceWorker.register('service-worker.js')
             .then(registration => {
                 console.log('Service Worker terdaftar:', registration);
