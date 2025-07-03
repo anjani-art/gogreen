@@ -12,22 +12,27 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, getDocs, where, query } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
         // Kofigurasi Firebase Anda (PASTIKAN MENGGANTINYA DENGAN KONFIGURASI PROYEK ANDA SENDIRI!)
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "YOUR_API_KEY", // Ganti dengan kunci API Anda
+            authDomain: "YOUR_AUTH_DOMAIN", // Ganti dengan authDomain Anda
+            projectId: "YOUR_PROJECT_ID", // Ganti dengan projectId Anda
+            storageBucket: "YOUR_STORAGE_BUCKET", // Ganti dengan storageBucket Anda
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // Ganti dengan messagingSenderId Anda
+            appId: "YOUR_APP_ID" // Ganti dengan appId Anda
         };
 
-        // Inisialisasi Firebase App
-        // Objek `firebase` sudah tersedia secara global dari script di atas
-        firebase.initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Penting: Membuat instance dan fungsi Firebase tersedia secara global untuk script.js
+        window.firebaseApp = app;
+        window.firebaseDb = db;
+        window.firebaseFirestore = { collection, doc, setDoc, getDocs, where, query };
     </script>
 </head>
 <body>
@@ -40,22 +45,19 @@
         <section id="homePage" class="page active">
             <h2>Jelajahi Solusi Hijau Kami</h2>
             <p>Selamat datang di EcoGlow, panduan Anda menuju gaya hidup yang lebih berkelanjutan. Temukan produk ramah lingkungan dan inspirasi DIY!</p>
-            <div class="category-grid" id="categoryGrid">
-                </div>
+            <div class="category-grid" id="categoryGrid"></div>
         </section>
 
         <section id="productListingsPage" class="page">
             <h2 id="productListingTitle">Produk EcoGlow</h2>
-            <div id="productList" class="product-list">
-                </div>
+            <div id="productList" class="product-list"></div>
         </section>
 
         <section id="productDetailPage" class="page">
             <h2 id="productDetailTitle">Detail Produk</h2>
             <div class="product-detail-content">
                 <h3 id="productName">Nama Produk</h3>
-                <div class="certification-tags" id="productCertifications">
-                    </div>
+                <div class="certification-tags" id="productCertifications"></div>
                 <h4>Bahan Baku:</h4>
                 <p id="productIngredients"></p>
                 <h4>Proses Produksi:</h4>
@@ -72,5 +74,6 @@
         <p>&copy; 2024 EcoGlow</p>
     </footer>
 
-    <script src="script.js"></script> </body>
+    <script src="script.js"></script>
+</body>
 </html>
