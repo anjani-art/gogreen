@@ -3,37 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoGlow</title>
+    <title>EcoGlow | Gaya Hidup Berkelanjutan</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#34D399">
     <link rel="apple-touch-icon" href="icon-192x192.png">
-    <meta name="description" content="EcoGlow: Panduan Anda menuju gaya hidup yang lebih berkelanjutan. Temukan produk ramah lingkungan dan inspirasi DIY.">
+    <meta name="description" content="EcoGlow: Panduan Anda menuju gaya hidup yang lebih berkelanjutan. Temukan produk ramah lingkungan, kelola catatan dan keuangan, serta inspirasi DIY.">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, getDocs, where, query } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-        // Kofigurasi Firebase Anda (PASTIKAN MENGGANTINYA DENGAN KONFIGURASI PROYEK ANDA SENDIRI!)
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY", // Ganti dengan kunci API Anda
-            authDomain: "YOUR_AUTH_DOMAIN", // Ganti dengan authDomain Anda
-            projectId: "YOUR_PROJECT_ID", // Ganti dengan projectId Anda
-            storageBucket: "YOUR_STORAGE_BUCKET", // Ganti dengan storageBucket Anda
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // Ganti dengan messagingSenderId Anda
-            appId: "YOUR_APP_ID" // Ganti dengan appId Anda
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
-        // Penting: Membuat instance dan fungsi Firebase tersedia secara global untuk script.js
-        window.firebaseApp = app;
-        window.firebaseDb = db;
-        window.firebaseFirestore = { collection, doc, setDoc, getDocs, where, query };
-    </script>
 </head>
 <body>
     <header class="app-header">
@@ -42,10 +19,87 @@
     </header>
 
     <main class="app-content">
-        <section id="homePage" class="page active">
-            <h2>Jelajahi Solusi Hijau Kami</h2>
-            <p>Selamat datang di EcoGlow, panduan Anda menuju gaya hidup yang lebih berkelanjutan. Temukan produk ramah lingkungan dan inspirasi DIY!</p>
-            <div class="category-grid" id="categoryGrid"></div>
+        <section id="dashboardPage" class="page active">
+            <section id="searchSection" class="feature-section">
+                <div class="search-bar">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Cari produk, catatan, atau ide...">
+                </div>
+                <div id="searchResults" class="search-results-container" style="display: none;">
+                    <h3>Hasil Pencarian</h3>
+                    <div id="productSearchResults" class="result-category"><h4>Produk</h4><div class="results-list"></div></div>
+                    <div id="noteSearchResults" class="result-category"><h4>Catatan</h4><div class="results-list"></div></div>
+                    <p id="noResultsMessage" style="display: none;">Tidak ditemukan hasil.</p>
+                </div>
+            </section>
+
+            <section id="notesSection" class="feature-section">
+                <h2>Catatan Saya <i class="fas fa-pencil-alt section-icon"></i></h2>
+                <div class="note-input-area">
+                    <textarea id="noteInput" placeholder="Tulis catatan baru di sini..."></textarea>
+                    <button id="addNoteButton" class="action-button">Tambah Catatan</button>
+                </div>
+                <div id="pinnedNotesList" class="notes-list pinned-list">
+                    <h3><i class="fas fa-thumbtack"></i> Catatan Tersemat</h3>
+                    <p class="empty-message" style="display: none;">Belum ada catatan tersemat.</p>
+                    </div>
+                <div id="otherNotesList" class="notes-list">
+                    <h3><i class="fas fa-clipboard"></i> Catatan Lain</h3>
+                    <p class="empty-message" style="display: none;">Belum ada catatan lain.</p>
+                    </div>
+            </section>
+
+            <section id="financeSection" class="feature-section">
+                <h2>Keuangan Berkelanjutan <i class="fas fa-wallet section-icon"></i></h2>
+                <div class="finance-summary-grid">
+                    <div class="summary-card income">
+                        <h4>Pemasukan</h4>
+                        <p id="totalIncome">Rp 0</p>
+                    </div>
+                    <div class="summary-card expense">
+                        <h4>Pengeluaran</h4>
+                        <p id="totalExpense">Rp 0</p>
+                    </div>
+                    <div class="summary-card balance">
+                        <h4>Saldo Bersih</h4>
+                        <p id="netBalance">Rp 0</p>
+                    </div>
+                </div>
+
+                <div class="transaction-input-area">
+                    <input type="number" id="transactionAmount" placeholder="Jumlah (Rp)" min="0">
+                    <input type="text" id="transactionDescription" placeholder="Deskripsi (mis: Beli tas belanja kain)">
+                    <select id="transactionType">
+                        <option value="expense">Pengeluaran</option>
+                        <option value="income">Pemasukan</option>
+                    </select>
+                    <button id="addTransactionButton" class="action-button">Tambah Transaksi</button>
+                </div>
+
+                <div class="transaction-history-container">
+                    <h3>Riwayat Transaksi</h3>
+                    <table id="transactionHistoryTable">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis</th>
+                                <th>Deskripsi</th>
+                                <th>Jumlah</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionHistoryBody">
+                            <tr class="empty-message" style="display: none;"><td colspan="5">Belum ada riwayat transaksi.</td></tr>
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="productCategorySection" class="feature-section">
+                <h2>Jelajahi Solusi Hijau Kami <i class="fas fa-leaf section-icon"></i></h2>
+                <p>Temukan produk ramah lingkungan dan inspirasi DIY!</p>
+                <div class="category-grid" id="categoryGrid"></div>
+            </section>
         </section>
 
         <section id="productListingsPage" class="page">
@@ -76,4 +130,5 @@
 
     <script src="script.js"></script>
 </body>
-</html>
+    </html>
+    
