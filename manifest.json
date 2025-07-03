@@ -1,21 +1,23 @@
 {
-    "name": "EcoGlow",
-    "short_name": "EcoGlow",
-    "description": "EcoGlow: Panduan Anda menuju gaya hidup yang lebih berkelanjutan. Temukan produk ramah lingkungan dan inspirasi DIY dengan tampilan modern.",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#34D399",
-    "icons": [
-        {
-            "src": "icon-192x192.png",  <!-- Path ikon diubah (tanpa garis miring) -->
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "icon-512x512.png",  <!-- Path ikon diubah (tanpa garis miring) -->
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ]
+  "name": "EcoGlow",
+  "short_name": "EcoGlow",
+  "description": "Panduan Gaya Hidup Berkelanjutan Anda",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4CAF50",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "portrait",
+  "lang": "id-ID"
 }
